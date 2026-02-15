@@ -1,0 +1,12 @@
+{
+  "name": "simbad-search-extension",
+  "displayName": "Search SIMBAD",
+  "version": "0.2.0",
+  "description": "A minimalistic web browser extension that brings the SIMBAD search functionality to wherever you are in the browser.",
+  "private": true,
+  "scripts": {
+    "build": "bun scripts/build.js",
+    "pack:chrome": "bun scripts/pack.js chrome",
+    "pack:firefox": "bun scripts/pack.js firefox"
+  }
+}

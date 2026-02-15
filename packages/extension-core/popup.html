@@ -1,0 +1,310 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Search SIMBAD</title>
+    <style>
+
+      :root {
+        --ink: #111827;
+        --muted: #5b6470;
+        --border: #d6dde7;
+        --surface: #f4f7fb;
+        --surface-strong: #ffffff;
+        --accent: #0ea5a4;
+        --accent-ink: #062b2b;
+        --accent-soft: #e7fbfb;
+        --action: #111827;
+        --action-ink: #ffffff;
+        --focus: rgba(14, 165, 164, 0.26);
+        --shadow: 0 14px 28px rgba(17, 24, 39, 0.16);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        /* padding: 16px; */
+        width: 360px;
+        font-family: sans-serif;
+        color: var(--ink);
+        background: linear-gradient(160deg, #f6f9fc 0%, #eef2f8 100%);
+      }
+
+      .app {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: 12px;
+        padding: 16px;
+        box-shadow: var(--shadow);
+      }
+
+      .header {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+        margin-bottom: 12px;
+      }
+
+      .title {
+        font-family: serif;
+        font-size: 17px;
+        font-weight: 700;
+        letter-spacing: 0.2px;
+      }
+
+      .subtitle {
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .tabs {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0;
+        border: 1px solid var(--border);
+        padding: 0;
+        margin-bottom: 12px;
+        background: var(--surface-strong);
+        border-radius: 10px;
+        overflow: hidden;
+      }
+
+      .tabs input {
+        display: none;
+      }
+
+      .tabs label {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        padding: 9px 0;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: var(--muted);
+        cursor: pointer;
+        transition: all 160ms ease;
+        border-right: 1px solid var(--border);
+      }
+
+      .tabs label:last-of-type {
+        border-right: none;
+      }
+
+      .tabs input:checked + label {
+        color: var(--ink);
+        background: var(--accent-soft);
+        border-bottom: 2px solid var(--accent);
+        box-shadow: inset 0 -1px 0 var(--accent);
+      }
+
+      .tabs label span {
+        display: block;
+        font-size: 10px;
+        font-weight: 500;
+        color: var(--muted);
+        margin-top: 2px;
+        letter-spacing: 0.4px;
+      }
+
+      .panel {
+        animation: fade 160ms ease;
+      }
+
+      .field {
+        margin-bottom: 10px;
+      }
+
+      .field > label {
+        display: block;
+        font-size: 14px;
+        text-transform: none;
+        letter-spacing: 0;
+        color: var(--muted);
+        font-weight: 500;
+        margin-bottom: 6px;
+      }
+
+      input[type="text"],
+      select {
+        width: 100%;
+        padding: 9px 11px;
+        border: 1px solid var(--border);
+        border-radius: 10px;
+        background: var(--surface-strong);
+        color: var(--ink);
+        font-size: 13px;
+        transition: border 140ms ease, box-shadow 140ms ease;
+      }
+
+      .mono {
+        font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, "Liberation Mono", monospace;
+        letter-spacing: 0.2px;
+      }
+
+      input[type="text"]:focus,
+      select:focus {
+        outline: none;
+        border-color: var(--accent);
+        box-shadow: 0 0 0 3px var(--focus);
+      }
+
+      .hint {
+        margin: 6px 0 0;
+        font-size: 11px;
+        color: var(--muted);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 10px;
+      }
+
+      .inline {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .primary {
+        width: 100%;
+        border: 1px solid transparent;
+        border-radius: 10px;
+        padding: 9px 12px;
+        font-size: 12px;
+        font-weight: 600;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: var(--action-ink);
+        background: var(--action);
+        cursor: pointer;
+        transition: transform 120ms ease, background 160ms ease, box-shadow 160ms ease;
+        box-shadow: 0 8px 16px rgba(15, 23, 42, 0.18);
+      }
+
+      .primary:disabled {
+        cursor: not-allowed;
+        opacity: 0.55;
+        box-shadow: none;
+        transform: none;
+      }
+
+      .primary:hover {
+        transform: translateY(-1px);
+        background: #111827;
+        box-shadow: 0 10px 18px rgba(15, 23, 42, 0.22);
+      }
+
+      .primary:active {
+        transform: translateY(0);
+        box-shadow: 0 6px 12px rgba(15, 23, 42, 0.18);
+      }
+
+      @keyframes fade {
+        from {
+          opacity: 0.2;
+          transform: translateY(4px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+    </style>
+    <script src="popup.js"></script>
+  </head>
+  <body>
+    <div class="app">
+      <header class="header">
+        <div class="title">Search SIMBAD</div>
+        <div class="subtitle">Astronomical object lookup</div>
+      </header>
+
+      <div class="tabs">
+        <input type="radio" name="options" id="tab-basic" value="option1" checked>
+        <label for="tab-basic">
+          Basic Query
+        </label>
+        <input type="radio" name="options" id="tab-coord" value="option2">
+        <label for="tab-coord">
+          Coordinate Query
+        </label>
+      </div>
+
+      <div id="content">
+        <div id="option1" class="panel">
+          <div class="field">
+            <label for="search-box1">Identifier or coordinates</label>
+            <input type="text" id="search-box1" class="mono" placeholder="M31, HD 189733, 05:35:17.3 +22:00:52">
+            <p class="hint">Identifier, coordinates (radius=10 arcmin), or bibcode.</p>
+          </div>
+          <button id="search-button1" class="primary">SEARCH</button>
+        </div>
+
+        <div id="option2" class="panel" style="display: none;">
+          <div class="field">
+            <label for="search-box2">Coordinates</label>
+            <input type="text" id="search-box2" class="mono" placeholder="05:35:17.3 +22:00:52">
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="system">System</label>
+              <select name="system" id="system">
+                <option value="FK4">FK4</option>
+                <option value="FK5" selected>FK5</option>
+                <option value="ICRS">ICRS</option>
+                <option value="Gal">Galactic</option>
+                <option value="SGal">Super-Gal</option>
+                <option value="Ecl">Ecliptic</option>
+              </select>
+            </div>
+
+            <div class="field">
+              <label for="frame">Preset frame</label>
+              <select name="frame" id="frame">
+                <option value="none">-- predefined frame --</option>
+                <option value="ICRS-J2000">ICRS, J2000, 2000</option>
+                <option value="FK5-J2000">FK5, J2000, 2000</option>
+                <option value="FK5-J1950">FK5, J1950, 1950</option>
+                <option value="FK4-B1950">FK4, B1950, 1950</option>
+                <option value="FK4-B1900">FK4, B1900, 1900</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="grid">
+            <div class="field">
+              <label for="epoch">Epoch</label>
+              <input type="text" id="epoch" class="mono" value="2000">
+            </div>
+            <div class="field">
+              <label for="equinox">Equinox</label>
+              <input type="text" id="equinox" class="mono" value="2000">
+            </div>
+          </div>
+
+          <div class="field">
+            <label>Search radius</label>
+            <div class="inline">
+              <input type="text" id="radius-search" class="mono" value="2">
+              <select name="radius-unit" id="radius-unit">
+                <option value="deg">deg</option>
+                <option value="arcmin" selected>arc min</option>
+                <option value="arcsec">arc sec</option>
+              </select>
+            </div>
+          </div>
+
+          <button id="search-button2" class="primary">SEARCH</button>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

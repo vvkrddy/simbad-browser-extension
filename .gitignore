@@ -1,2 +1,7 @@
 **/.ipynb_checkpoints/
-
+.DS_Store
+node_modules/
+dist/
+artifacts/
+web-ext-artifacts/
+*.zip
